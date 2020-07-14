@@ -37,7 +37,7 @@ class Main(AggregationBaseClass):
             return None
         for entity, entity_data in response["entities"].items():
             for doc in entity_data:
-
+                print(doc)
                 """
                 'doc_id': doc_id,
                     'type': item,
@@ -50,10 +50,9 @@ class Main(AggregationBaseClass):
 
                 doc['key'] = doc['doc_id']
                 doc["entity_type"] = doc['type']
-                doc["document_start"] = item['corpus_modified'].find(doc['surface_form'])
-
-                doc["document_end"] = doc["document_start"] + len(doc['surface_form'])
-                doc["surfaceForm"] = doc['surface_form']
-
-                file_entities.append(doc)
+                if doc.get("surface_form"):
+                    doc["surfaceForm"] = doc['surface_form']
+                    doc["document_start"] = doc.get("start", item['corpus_modified'].find(doc['surface_form']))
+                    doc["document_end"] = doc.get("end", doc["document_start"] + len(doc['surface_form']))
+                    file_entities.append(doc)
         return file_entities
