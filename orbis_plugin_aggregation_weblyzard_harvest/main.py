@@ -7,6 +7,7 @@ from urllib.parse import unquote_plus
 
 from orbis_eval.core.base import AggregationBaseClass
 # from orbis_plugin_aggregation_dbpedia_entity_types import Main as dbpedia_entity_types
+from orbis_eval.libs.calculate_position import get_start_end_position
 
 import logging
 logger = logging.getLogger("Weblyzard_Harvest")
@@ -52,7 +53,8 @@ class Main(AggregationBaseClass):
                 doc["entity_type"] = doc['type']
                 if doc.get("surface_form"):
                     doc["surfaceForm"] = doc['surface_form']
-                    doc["document_start"] = doc.get("start", item['corpus_modified'].find(doc['surface_form']))
-                    doc["document_end"] = doc.get("end", doc["document_start"] + len(doc['surface_form']))
+                    doc["document_start"], doc["document_end"] = get_start_end_position(doc["surfaceForm"], item['corpus_modified'], 0)
+                    # doc["document_start"] = doc.get("start", item['corpus_modified'].find(doc['surface_form']))
+                    # doc["document_end"] = doc.get("end", doc["document_start"] + len(doc['surface_form']))
                     file_entities.append(doc)
         return file_entities
