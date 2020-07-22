@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import requests
-import html
 import json
-from urllib.parse import unquote_plus
 
 from orbis_eval.core.base import AggregationBaseClass
-# from orbis_plugin_aggregation_dbpedia_entity_types import Main as dbpedia_entity_types
 from orbis_eval.libs.calculate_position import get_start_end_position
 
 import logging
@@ -36,6 +33,7 @@ class Main(AggregationBaseClass):
 
         if not response:
             return None
+        current_index = 0
         for entity, entity_data in response["entities"].items():
             for doc in entity_data:
                 print(doc)
@@ -53,8 +51,16 @@ class Main(AggregationBaseClass):
                 doc["entity_type"] = doc['type']
                 if doc.get("surface_form"):
                     doc["surfaceForm"] = doc['surface_form']
-                    doc["document_start"], doc["document_end"] = get_start_end_position(doc["surfaceForm"], item['corpus_modified'], 0)
-                    # doc["document_start"] = doc.get("start", item['corpus_modified'].find(doc['surface_form']))
-                    # doc["document_end"] = doc.get("end", doc["document_start"] + len(doc['surface_form']))
+                    if doc.get("start") and doc.get("end"):
+                        doc["document_start"] = doc['start']
+                        doc["document_end"] = doc['end']
+                        end_index = doc['end']
+                    else:
+                        start_index_, end_index = get_start_end_position(doc['surface_form'], item['corpus_modified'],
+                                                                         current_index)
+                        doc["document_start"] = start_index_
+                        doc["document_end"] = end_index
                     file_entities.append(doc)
+                    if end_index > current_index:
+                        current_index = end_index
         return file_entities
