@@ -23,7 +23,7 @@ class Main(AggregationBaseClass):
 
         """
         service_url = 'http://localhost:5000/extract_from_html'
-        data = {'url': item['url'], 'html': item['corpus'], 'text': item['corpus_modified']}
+        data = {'url': item['url'], 'html': item['corpus_modified'], 'text': item['corpus']}
 
         try:
             response = requests.post(service_url, json=data)
